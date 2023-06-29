@@ -12,19 +12,9 @@ export default setImageSize
  * "ftp://"
  */
 const absolutePathRegex = /^(?:[a-z]+:)?\/\//
-/**
- * Handles:
- * ".svg"
- * ".SVG"
- */
-const svgExtRegex = /\\.svg/i
 
 function getImageSize(src, dir) {
   if (absolutePathRegex.exec(src)) {
-    return
-  }
-
-  if (!svgExtRegex.test(path.extname(src))) {
     return
   }
 
@@ -34,7 +24,11 @@ function getImageSize(src, dir) {
   if (dir && shouldJoin) {
     src = path.join(dir, src)
   }
-  return sizeOf(src)
+  try {
+    return sizeOf(src)
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 function setImageSize(options) {

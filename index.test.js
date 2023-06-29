@@ -54,17 +54,3 @@ test('external images are ignored', (done) => {
       done()
     })
 })
-
-test('svg images are ignored', (done) => {
-  unified()
-    .use(parse)
-    .use(remark2rehype)
-    .use(rehypeImgSize)
-    .use(stringify)
-    .process(vfile.readSync('svg.md'), function (err, file) {
-      expect(err).toBeNull()
-      expect(file.toString()).toBe(`<h1>Hello, world!</h1>
-<p><img src="/img.svg" alt="sample svg"></p>`)
-      done()
-    })
-})
