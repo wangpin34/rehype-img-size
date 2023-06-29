@@ -12,11 +12,22 @@ export default setImageSize
  * "ftp://"
  */
 const absolutePathRegex = /^(?:[a-z]+:)?\/\//
+/**
+ * Handles:
+ * ".svg"
+ * ".SVG"
+ */
+const svgExtRegex = /\\.svg/i
 
 function getImageSize(src, dir) {
   if (absolutePathRegex.exec(src)) {
     return
   }
+
+  if (!svgExtRegex.test(path.extname(src))) {
+    return
+  }
+
   // Treat `/` as a relative path, according to the server
   const shouldJoin = !path.isAbsolute(src) || src.startsWith('/')
 
@@ -25,8 +36,6 @@ function getImageSize(src, dir) {
   }
   return sizeOf(src)
 }
-
-const svgExtRegExp = /\\.svg/i
 
 function setImageSize(options) {
   const opts = options || {}
@@ -38,15 +47,9 @@ function setImageSize(options) {
     function visitor(node) {
       if (node.tagName === 'img') {
         const src = node.properties.src
-        if (!svgExtRegExp.test(path.extname(src))) {
-          try {
-            const dimensions = getImageSize(src, dir) || {}
-            node.properties.width = dimensions.width
-            node.properties.height = dimensions.height
-          } catch (err) {
-            console.log(err.message)
-          }
-        }
+        const dimensions = getImageSize(src, dir) || {}
+        node.properties.width = dimensions.width
+        node.properties.height = dimensions.height
       }
     }
   }
