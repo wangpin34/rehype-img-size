@@ -1,8 +1,8 @@
-import {unified} from 'unified'
+import stringify from 'rehype-stringify'
 import parse from 'remark-parse'
 import remark2rehype from 'remark-rehype'
-import stringify from 'rehype-stringify'
 import * as vfile from 'to-vfile'
+import { unified } from 'unified'
 import rehypeImgSize from './index'
 
 beforeAll(() => {
@@ -19,7 +19,7 @@ test('images in the same directory', (done) => {
     .use(remark2rehype)
     .use(rehypeImgSize)
     .use(stringify)
-    .process(vfile.readSync('test.md'), function(err, file) {
+    .process(vfile.readSync('test.md'), function (err, file) {
       expect(err).toBeNull()
       expect(file.toString()).toBe(`<h1>Hello, world!</h1>
 <p><img src="img.png" alt="" width="640" height="480"></p>`)
@@ -33,7 +33,7 @@ test('images in sub directory', (done) => {
     .use(remark2rehype)
     .use(rehypeImgSize, { dir: 'static' })
     .use(stringify)
-    .process(vfile.readSync('sub.md'), function(err, file) {
+    .process(vfile.readSync('sub.md'), function (err, file) {
       expect(err).toBeNull()
       expect(file.toString()).toBe(`<h1>Hello, world!</h1>
 <p><img src="/img/sub.png" alt="" width="320" height="240"></p>`)
@@ -47,10 +47,24 @@ test('external images are ignored', (done) => {
     .use(remark2rehype)
     .use(rehypeImgSize)
     .use(stringify)
-    .process(vfile.readSync('ext.md'), function(err, file) {
+    .process(vfile.readSync('ext.md'), function (err, file) {
       expect(err).toBeNull()
       expect(file.toString()).toBe(`<h1>Hello, world!</h1>
 <p><img src="https://example.com/img.png" alt=""></p>`)
+      done()
+    })
+})
+
+test('svg images are ignored', (done) => {
+  unified()
+    .use(parse)
+    .use(remark2rehype)
+    .use(rehypeImgSize)
+    .use(stringify)
+    .process(vfile.readSync('svg.md'), function (err, file) {
+      expect(err).toBeNull()
+      expect(file.toString()).toBe(`<h1>Hello, world!</h1>
+<p><img src="/img.svg" alt="sample svg"></p>`)
       done()
     })
 })
